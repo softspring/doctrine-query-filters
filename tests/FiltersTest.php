@@ -18,7 +18,7 @@ class FiltersTest extends TypeTestCase
     {
         return [
             [['name__like' => 'test'], 'SELECT t FROM test t WHERE t.name LIKE "%test%"'],
-            [['status__in' => ['1', '2']], 'SELECT t FROM test t WHERE t.status IN(\'1\', \'2\')' ],
+            [['status__in' => ['1', '2']], 'SELECT t FROM test t WHERE t.status IN(\'1\', \'2\')'],
             [['field__null' => true], 'SELECT t FROM test t WHERE t.field IS NULL'],
             [['field__null' => false], 'SELECT t FROM test t WHERE t.field IS NOT NULL'],
             [['age__lt' => 1], 'SELECT t FROM test t WHERE t.age < 1'],
@@ -29,7 +29,7 @@ class FiltersTest extends TypeTestCase
             [['age__is' => 'null'], 'SELECT t FROM test t WHERE t.age IS NULL'],
             [['age__is' => 'not_null'], 'SELECT t FROM test t WHERE t.age IS NOT NULL'],
             [['field_with_underscores__like' => 'test'], 'SELECT t FROM test t WHERE t.field_with_underscores LIKE "%test%"'],
-            [['raw' => 'value'], 'SELECT t FROM test t WHERE t.raw = "value"' ],
+            [['raw' => 'value'], 'SELECT t FROM test t WHERE t.raw = "value"'],
             [['raw_with_underscores' => 'test'], 'SELECT t FROM test t WHERE t.raw_with_underscores = "test"'],
             [['name__like' => 'test', 'age__lt' => 1], 'SELECT t FROM test t WHERE t.name LIKE "%test%" AND t.age < 1'],
             [['date__between' => ['01-01-1900', '01-01-2000']], 'SELECT t FROM test t WHERE t.date BETWEEN "01-01-1900" AND "01-01-2000"'],
@@ -54,7 +54,7 @@ class FiltersTest extends TypeTestCase
         $dql = $qb->getDQL();
         /** @var Parameter $param */
         foreach ($params as $param) {
-            $dql = str_ireplace(':'.$param->getName(), '"'. $param->getValue() . '"', $dql);
+            $dql = str_ireplace(':'.$param->getName(), '"'.$param->getValue().'"', $dql);
         }
         $this->assertEquals($expectedDql, $dql);
     }
@@ -101,7 +101,7 @@ class FiltersTest extends TypeTestCase
         $dql = $qb->getDQL();
         /** @var Parameter $param */
         foreach ($params as $param) {
-            $dql = str_ireplace(':'.$param->getName(), '"'. $param->getValue() . '"', $dql);
+            $dql = str_ireplace(':'.$param->getName(), '"'.$param->getValue().'"', $dql);
         }
 
         $this->assertEquals('SELECT t FROM test t WHERE t.example LIKE "%john%"', $dql);

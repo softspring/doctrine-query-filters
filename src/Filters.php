@@ -3,8 +3,8 @@
 namespace Softspring\Component\DoctrineQueryFilters;
 
 use Doctrine\ORM\QueryBuilder;
-use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterValueException;
 use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterFormException;
+use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterValueException;
 use Softspring\Component\DoctrineQueryFilters\Exception\MissingFromInQueryBuilderException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,6 +70,7 @@ class Filters
 
             case 'in':
                 $qb->andWhere($qb->expr()->in(sprintf('%s.%s', $entityAlias, $fieldName), is_array($value) ? $value : [$value]));
+
                 return;
 
             case 'between':
@@ -83,14 +84,16 @@ class Filters
                 $value1 = is_numeric($value1) ? $value1 : "\"$value1\"";
 
                 $qb->andWhere($qb->expr()->between(sprintf('%s.%s', $entityAlias, $fieldName), $value0, $value1));
+
                 return;
 
             case 'lt':
             case 'lte':
             case 'gt':
             case 'gte':
-                $value = $value instanceof \DateTime ? "\"".$value->format('Y-m-d')."\"" : $value;
+                $value = $value instanceof \DateTime ? '"'.$value->format('Y-m-d').'"' : $value;
                 $qb->andWhere($qb->expr()->$operatorName(sprintf('%s.%s', $entityAlias, $fieldName), $value));
+
                 return;
 
             case 'null':
@@ -99,17 +102,19 @@ class Filters
                 } else {
                     $qb->andWhere(sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName));
                 }
-                return;
+
+            return;
 
             case 'is':
-                if ($value === null || $value === 'null') {
+                if (null === $value || 'null' === $value) {
                     $qb->andWhere(sprintf('%s.%s IS NULL', $entityAlias, $fieldName));
-                } elseif ($value === 'not_null') {
+                } elseif ('not_null' === $value) {
                     $qb->andWhere(sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName));
                 } else {
                     throw new InvalidFilterValueException('Invalid is filter, must be "null", null or "not_null", no other case is yet implemented');
                 }
-                return;
+
+            return;
 
             default:
                 $fieldName = $field;
@@ -124,11 +129,11 @@ class Filters
     {
         $parts = explode('__', $field);
 
-        if (sizeof($parts) == 1) {
+        if (1 == sizeof($parts)) {
             return [$parts[0], null];
         }
 
-        if (sizeof($parts) == 2) {
+        if (2 == sizeof($parts)) {
             return $parts;
         }
 
