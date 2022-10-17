@@ -7,3 +7,4 @@ This library adds a new filter for doctrine queries
 [![License](https://poser.pugx.org/softspring/doctrine-query-filters/license.svg)](https://packagist.org/packages/softspring/doctrine-query-filters)
 [![Total Downloads](https://poser.pugx.org/softspring/doctrine-query-filters/downloads)](https://packagist.org/packages/softspring/doctrine-query-filters)
 [![Build status](https://github.com/softspring/doctrine-query-filters/actions/workflows/php.yml/badge.svg?branch=5.0)](https://github.com/softspring/doctrine-query-filters/actions/workflows/php.yml)
+![Coverage](https://raw.githubusercontent.com/softspring/doctrine-query-filters/5.0/.github/badges/coverage.svg)
