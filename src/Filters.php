@@ -115,7 +115,7 @@ class Filters
                     $qb->andWhere(sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName));
                 }
 
-            return;
+                return;
 
             case 'is':
                 if (null === $value || 'null' === $value) {
@@ -126,7 +126,7 @@ class Filters
                     throw new InvalidFilterValueException('Invalid is filter, must be "null", null or "not_null", no other case is yet implemented');
                 }
 
-            return;
+                return;
 
             default:
                 $fieldName = $field;
