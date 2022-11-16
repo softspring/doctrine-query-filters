@@ -45,6 +45,18 @@ class Filters
         return $qb;
     }
 
+    public static function sortBy(QueryBuilder $qb, array $orderBy): QueryBuilder
+    {
+        $entityAliases = $qb->getAllAliases();
+        $entityAlias = $entityAliases[0];
+
+        foreach ($orderBy as $field => $order) {
+            $qb->addOrderBy("$entityAlias.$field", $order);
+        }
+
+        return $qb;
+    }
+
     /**
      * @throws InvalidFilterValueException
      * @throws MissingFromInQueryBuilderException
