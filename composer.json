@@ -25,5 +25,8 @@
         "psr-4": {
             "Softspring\\Component\\DoctrineQueryFilters\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
