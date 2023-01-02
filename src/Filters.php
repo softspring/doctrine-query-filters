@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Filters
 {
+    public const MODE_AND = 1;
+
+    public const MODE_OR = 2;
+
     /**
      * @throws InvalidFilterFormException
      * @throws InvalidFilterValueException
@@ -26,7 +30,8 @@ class Filters
         $request && $filterForm->handleRequest($request);
 
         if ($filterForm->isSubmitted() && $filterForm->isValid()) {
-            self::apply($qb, $filterForm->getData());
+            $mode = $filterForm->getConfig()->getOption('query_builder_mode', self::MODE_AND);
+            self::apply($qb, $filterForm->getData(), $mode);
         }
 
         return $qb;
@@ -36,10 +41,17 @@ class Filters
      * @throws InvalidFilterValueException
      * @throws MissingFromInQueryBuilderException
      */
-    public static function apply(QueryBuilder $qb, array $filters): QueryBuilder
+    public static function apply(QueryBuilder $qb, array $filters, int $mode = self::MODE_AND): QueryBuilder
     {
         foreach ($filters as $filterName => $value) {
-            self::filterField($qb, $filterName, $value);
+            $filters = self::splitOrFields($filterName);
+            $filtersExpression = $qb->expr()->orX();
+
+            foreach ($filters as $filter) {
+                $filtersExpression->add(self::buildFieldExpression($qb, $filter, $value));
+            }
+
+            self::MODE_OR === $mode ? $qb->orWhere($filtersExpression) : $qb->andWhere($filtersExpression);
         }
 
         return $qb;
@@ -57,11 +69,33 @@ class Filters
         return $qb;
     }
 
+    protected static function joinEntityAlias(QueryBuilder $qb, string $entityAlias, string $fieldName): string
+    {
+        $joins = $qb->getDQLPart('join'); // [0]=> { from: class_name, alias: 'x', indexBy = null }
+
+        $joinFieldName = sprintf('%s.%s', $entityAlias, $fieldName);
+
+        $joinDefined = false;
+        foreach ($joins as $a => $join) {
+            if ($join[0]->getJoin() == $joinFieldName) {
+                $joinDefined = true;
+            }
+        }
+
+        $fieldAlias = $fieldName;
+
+        if (!$joinDefined) {
+            $qb->leftJoin($joinFieldName, $fieldAlias);
+        }
+
+        return $fieldAlias;
+    }
+
     /**
      * @throws InvalidFilterValueException
      * @throws MissingFromInQueryBuilderException
      */
-    protected static function filterField(QueryBuilder $qb, string $field, $value): void
+    protected static function buildFieldExpression(QueryBuilder $qb, string $field, $value)
     {
         [$fieldName, $operatorName] = self::splitFieldName($field);
         $entityAliases = $qb->getAllAliases();
@@ -72,6 +106,12 @@ class Filters
 
         $entityAlias = $entityAliases[0];
 
+        if (str_contains($fieldName, '.')) {
+            $fieldNameParts = explode('.', $fieldName);
+            $fieldName = $fieldNameParts[1];
+            $entityAlias = self::joinEntityAlias($qb, $entityAlias, $fieldNameParts[0]);
+        }
+
         $fieldParameter = 'f'.substr(md5($field), 0, 5);
 
         switch ($operatorName) {
@@ -81,9 +121,7 @@ class Filters
                 break;
 
             case 'in':
-                $qb->andWhere($qb->expr()->in(sprintf('%s.%s', $entityAlias, $fieldName), is_array($value) ? $value : [$value]));
-
-                return;
+                return $qb->expr()->in(sprintf('%s.%s', $entityAlias, $fieldName), is_array($value) ? $value : [$value]);
 
             case 'between':
                 $value0 = $value[0];
@@ -95,46 +133,47 @@ class Filters
                 $value0 = is_numeric($value0) ? $value0 : "\"$value0\"";
                 $value1 = is_numeric($value1) ? $value1 : "\"$value1\"";
 
-                $qb->andWhere($qb->expr()->between(sprintf('%s.%s', $entityAlias, $fieldName), $value0, $value1));
-
-                return;
+                return $qb->expr()->between(sprintf('%s.%s', $entityAlias, $fieldName), $value0, $value1);
 
             case 'lt':
             case 'lte':
             case 'gt':
             case 'gte':
                 $value = $value instanceof \DateTime ? '"'.$value->format('Y-m-d').'"' : $value;
-                $qb->andWhere($qb->expr()->$operatorName(sprintf('%s.%s', $entityAlias, $fieldName), $value));
 
-                return;
+                return $qb->expr()->$operatorName(sprintf('%s.%s', $entityAlias, $fieldName), $value);
 
             case 'null':
                 if ($value) {
-                    $qb->andWhere(sprintf('%s.%s IS NULL', $entityAlias, $fieldName));
+                    return sprintf('%s.%s IS NULL', $entityAlias, $fieldName);
                 } else {
-                    $qb->andWhere(sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName));
+                    return sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName);
                 }
 
-                return;
-
+                // no break
             case 'is':
                 if (null === $value || 'null' === $value) {
-                    $qb->andWhere(sprintf('%s.%s IS NULL', $entityAlias, $fieldName));
+                    return sprintf('%s.%s IS NULL', $entityAlias, $fieldName);
                 } elseif ('not_null' === $value) {
-                    $qb->andWhere(sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName));
+                    return sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName);
                 } else {
                     throw new InvalidFilterValueException('Invalid is filter, must be "null", null or "not_null", no other case is yet implemented');
                 }
 
-                return;
-
+                // no break
             default:
                 $fieldName = $field;
                 $operator = '=';
         }
 
-        $qb->andWhere(sprintf('%s.%s %s :%s', $entityAlias, $fieldName, $operator, $fieldParameter));
         $qb->setParameter($fieldParameter, $value);
+
+        return sprintf('%s.%s %s :%s', $entityAlias, $fieldName, $operator, $fieldParameter);
+    }
+
+    protected static function splitOrFields(string $fieldName): array
+    {
+        return explode('___or___', $fieldName);
     }
 
     private static function splitFieldName(string $field): array

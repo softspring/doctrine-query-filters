@@ -20,6 +20,7 @@ class FiltersForm extends AbstractType implements FilterFormInterface
             'required' => false,
             'attr' => ['novalidate' => 'novalidate'],
             'allow_extra_fields' => true,
+            'query_builder_mode' => Filters::MODE_AND,
         ]);
     }
 }
