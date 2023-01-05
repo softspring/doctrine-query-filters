@@ -15,27 +15,27 @@ class Filters
 
     public const MODE_OR = 2;
 
-    /**
-     * @throws InvalidFilterFormException
-     * @throws InvalidFilterValueException
-     * @throws MissingFromInQueryBuilderException
-     */
-    public static function applyForm(QueryBuilder $qb, FormInterface $filterForm, ?Request $request = null): QueryBuilder
-    {
-        $reflectionClass = new \ReflectionClass($filterForm->getConfig()->getType()->getInnerType());
-        if (!$reflectionClass->implementsInterface(FilterFormInterface::class)) {
-            throw new InvalidFilterFormException();
-        }
-
-        $request && $filterForm->handleRequest($request);
-
-        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
-            $mode = $filterForm->getConfig()->getOption('query_builder_mode', self::MODE_AND);
-            self::apply($qb, $filterForm->getData(), $mode);
-        }
-
-        return $qb;
-    }
+//    /**
+//     * @throws InvalidFilterFormException
+//     * @throws InvalidFilterValueException
+//     * @throws MissingFromInQueryBuilderException
+//     */
+//    public static function applyForm(QueryBuilder $qb, FormInterface $filterForm, ?Request $request = null): QueryBuilder
+//    {
+//        $reflectionClass = new \ReflectionClass($filterForm->getConfig()->getType()->getInnerType());
+//        if (!$reflectionClass->implementsInterface(FilterFormInterface::class)) {
+//            throw new InvalidFilterFormException();
+//        }
+//
+//        $request && $filterForm->handleRequest($request);
+//
+//        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+//            $mode = $filterForm->getConfig()->getOption('query_builder_mode', self::MODE_AND);
+//            self::apply($qb, $filterForm->getData(), $mode);
+//        }
+//
+//        return $qb;
+//    }
 
     /**
      * @throws InvalidFilterValueException
@@ -62,8 +62,14 @@ class Filters
         $entityAliases = $qb->getAllAliases();
         $entityAlias = $entityAliases[0];
 
-        foreach ($orderBy as $field => $order) {
-            $qb->addOrderBy("$entityAlias.$field", $order);
+        foreach ($orderBy as $fieldName => $order) {
+            if (str_contains($fieldName, '.')) {
+                $fieldNameParts = explode('.', $fieldName);
+                $fieldName = $fieldNameParts[1];
+                $entityAlias = self::joinEntityAlias($qb, $entityAlias, $fieldNameParts[0]);
+            }
+
+            $qb->addOrderBy("$entityAlias.$fieldName", $order);
         }
 
         return $qb;
@@ -76,13 +82,13 @@ class Filters
         $joinFieldName = sprintf('%s.%s', $entityAlias, $fieldName);
 
         $joinDefined = false;
+        $fieldAlias = $fieldName;
         foreach ($joins as $a => $join) {
             if ($join[0]->getJoin() == $joinFieldName) {
                 $joinDefined = true;
+                $fieldAlias = $join[0]->getAlias();
             }
         }
-
-        $fieldAlias = $fieldName;
 
         if (!$joinDefined) {
             $qb->leftJoin($joinFieldName, $fieldAlias);
