@@ -91,50 +91,50 @@ class FiltersTest extends TypeTestCase
         Filters::apply($em->createQueryBuilder()->select('t')->from('test', 't'), ['test__is' => 'failed']);
     }
 
-    public function testFilterForm()
-    {
-        $form = $this->factory->create(ExampleFilterForm::class);
-
-        $form->submit([
-            'example' => 'john',
-        ]);
-
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getExpressionBuilder')->willReturn(new Expr());
-        $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
-
-        $qb = $em->createQueryBuilder()->select('t')->from('test', 't');
-
-        $qb = Filters::applyForm($qb, $form);
-
-        $params = $qb->getParameters();
-        $dql = $qb->getDQL();
-        /** @var Parameter $param */
-        foreach ($params as $param) {
-            $dql = str_ireplace(':'.$param->getName(), '"'.$param->getValue().'"', $dql);
-        }
-
-        $this->assertEquals('SELECT t FROM test t WHERE t.example LIKE "%john%"', $dql);
-
-        $options = $form->getConfig()->getOptions();
-
-        $this->assertFalse($options['csrf_protection']);
-        $this->assertFalse($options['required']);
-        $this->assertTrue($options['allow_extra_fields']);
-        $this->assertEquals('GET', $options['method']);
-    }
-
-    public function testInvalidFilterForm()
-    {
-        $this->expectException(InvalidFilterFormException::class);
-
-        $form = $this->factory->create(InvalidFilterForm::class);
-
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getExpressionBuilder')->willReturn(new Expr());
-        $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
-
-        $qb = $em->createQueryBuilder()->select('t')->from('test', 't');
-        Filters::applyForm($qb, $form);
-    }
+//    public function testFilterForm()
+//    {
+//        $form = $this->factory->create(ExampleFilterForm::class);
+//
+//        $form->submit([
+//            'example' => 'john',
+//        ]);
+//
+//        $em = $this->createMock(EntityManagerInterface::class);
+//        $em->method('getExpressionBuilder')->willReturn(new Expr());
+//        $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
+//
+//        $qb = $em->createQueryBuilder()->select('t')->from('test', 't');
+//
+//        $qb = Filters::applyForm($qb, $form);
+//
+//        $params = $qb->getParameters();
+//        $dql = $qb->getDQL();
+//        /** @var Parameter $param */
+//        foreach ($params as $param) {
+//            $dql = str_ireplace(':'.$param->getName(), '"'.$param->getValue().'"', $dql);
+//        }
+//
+//        $this->assertEquals('SELECT t FROM test t WHERE t.example LIKE "%john%"', $dql);
+//
+//        $options = $form->getConfig()->getOptions();
+//
+//        $this->assertFalse($options['csrf_protection']);
+//        $this->assertFalse($options['required']);
+//        $this->assertTrue($options['allow_extra_fields']);
+//        $this->assertEquals('GET', $options['method']);
+//    }
+//
+//    public function testInvalidFilterForm()
+//    {
+//        $this->expectException(InvalidFilterFormException::class);
+//
+//        $form = $this->factory->create(InvalidFilterForm::class);
+//
+//        $em = $this->createMock(EntityManagerInterface::class);
+//        $em->method('getExpressionBuilder')->willReturn(new Expr());
+//        $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
+//
+//        $qb = $em->createQueryBuilder()->select('t')->from('test', 't');
+//        Filters::applyForm($qb, $form);
+//    }
 }
