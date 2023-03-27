@@ -42,6 +42,10 @@ class FiltersForm extends AbstractType implements FilterFormInterface
         $resolver->addAllowedTypes('query_builder', ['null', 'callable', QueryBuilder::class]);
 
         $resolver->setNormalizer('query_builder', function (Options $options, $queryBuilder) {
+            if ($queryBuilder instanceof QueryBuilder) {
+                return $queryBuilder;
+            }
+
             if (\is_callable($queryBuilder)) {
                 $queryBuilder = $queryBuilder($options['em']->getRepository($options['class']));
 
