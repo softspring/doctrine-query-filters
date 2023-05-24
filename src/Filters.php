@@ -168,7 +168,9 @@ class Filters
 
                 // no break
             default:
-                $fieldName = $field;
+                if (!isset($fieldNameParts)) {
+                    $fieldName = $field;
+                }
                 $operator = '=';
         }
 

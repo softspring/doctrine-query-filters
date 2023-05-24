@@ -56,7 +56,10 @@ class FiltersForm extends AbstractType implements FilterFormInterface
                 return $queryBuilder;
             }
 
-            return $options['em']->getRepository($options['class'])->createQueryBuilder(strtolower(substr($options['class'], 0, 1)));
+            $reflectionClass = new \ReflectionClass($options['class']);
+            $entityAlias = strtolower(substr($reflectionClass->getShortName(), 0, 1));
+
+            return $options['em']->getRepository($options['class'])->createQueryBuilder($entityAlias);
         });
     }
 }
