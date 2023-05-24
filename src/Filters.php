@@ -15,27 +15,27 @@ class Filters
 
     public const MODE_OR = 2;
 
-//    /**
-//     * @throws InvalidFilterFormException
-//     * @throws InvalidFilterValueException
-//     * @throws MissingFromInQueryBuilderException
-//     */
-//    public static function applyForm(QueryBuilder $qb, FormInterface $filterForm, ?Request $request = null): QueryBuilder
-//    {
-//        $reflectionClass = new \ReflectionClass($filterForm->getConfig()->getType()->getInnerType());
-//        if (!$reflectionClass->implementsInterface(FilterFormInterface::class)) {
-//            throw new InvalidFilterFormException();
-//        }
-//
-//        $request && $filterForm->handleRequest($request);
-//
-//        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
-//            $mode = $filterForm->getConfig()->getOption('query_builder_mode', self::MODE_AND);
-//            self::apply($qb, $filterForm->getData(), $mode);
-//        }
-//
-//        return $qb;
-//    }
+    //    /**
+    //     * @throws InvalidFilterFormException
+    //     * @throws InvalidFilterValueException
+    //     * @throws MissingFromInQueryBuilderException
+    //     */
+    //    public static function applyForm(QueryBuilder $qb, FormInterface $filterForm, ?Request $request = null): QueryBuilder
+    //    {
+    //        $reflectionClass = new \ReflectionClass($filterForm->getConfig()->getType()->getInnerType());
+    //        if (!$reflectionClass->implementsInterface(FilterFormInterface::class)) {
+    //            throw new InvalidFilterFormException();
+    //        }
+    //
+    //        $request && $filterForm->handleRequest($request);
+    //
+    //        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+    //            $mode = $filterForm->getConfig()->getOption('query_builder_mode', self::MODE_AND);
+    //            self::apply($qb, $filterForm->getData(), $mode);
+    //        }
+    //
+    //        return $qb;
+    //    }
 
     /**
      * @throws InvalidFilterValueException
@@ -168,7 +168,9 @@ class Filters
 
                 // no break
             default:
-                $fieldName = $field;
+                if (!isset($fieldNameParts)) {
+                    $fieldName = $field;
+                }
                 $operator = '=';
         }
 
