@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ExampleFilterForm extends FiltersForm
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('example', TextType::class, [
             'property_path' => '[example__like]',
