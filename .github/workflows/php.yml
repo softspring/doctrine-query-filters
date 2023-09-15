@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ 5.1 ]
+    branches: [ 5.2 ]
   pull_request:
-    branches: [ 5.1 ]
+    branches: [ 5.2 ]
 
 permissions:
   contents: read
@@ -23,7 +23,7 @@ jobs:
         composer-prefer: [ '', '--prefer-lowest' ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
