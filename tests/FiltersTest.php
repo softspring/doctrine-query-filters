@@ -3,6 +3,8 @@
 namespace Softspring\Component\DoctrineQueryFilters\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -40,6 +42,12 @@ class FiltersTest extends TypeTestCase
             [['date__between' => ['01-01-1900', '01-01-2000']], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.date BETWEEN "01-01-1900" AND "01-01-2000"'],
             [['number__between' => [50, 100]], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.number BETWEEN 50 AND 100'],
             [['other__file__name__' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.other__file__name__ = "test"'],
+            [['children->field__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t IN(SELECT IDENTITY(ch.parent) FROM test t WHERE ch.parent = t.id AND t.field LIKE "%test%")', [
+                'children' => [
+                    'targetEntity' => 'TestClass',
+                    'mappedBy' => 'parent',
+                ],
+            ]],
             [[], ['field' => 'asc'], Filters::MODE_AND, 'SELECT t FROM test t ORDER BY t.field asc'],
         ];
     }
@@ -47,11 +55,28 @@ class FiltersTest extends TypeTestCase
     /**
      * @dataProvider collectionProvider
      */
-    public function testAddPaginationFirstPage(array $filters, array $sortBy, int $mode, string $expectedDql): void
+    public function testAddPaginationFirstPage(array $filters, array $sortBy, int $mode, string $expectedDql, array $associationMapping = []): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getExpressionBuilder')->willReturn(new Expr());
         $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
+
+
+        $em->method('getRepository')->willReturnCallback(function ($className) use ($em) {
+            $repository = $this->createMock(EntityRepository::class);
+            $repository->method('createQueryBuilder')->willReturn($sqb = new QueryBuilder($em));
+            $sqb->from('test', 't');
+
+            return $repository;
+        });
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getAssociationMapping')->willReturnCallback(function($fieldName) use ($associationMapping) {
+            return $associationMapping[$fieldName] ?? null;
+        });
+        $classMetadataMock->method('getSingleIdentifierFieldName')->willReturn('id');
+
+        $em->method('getClassMetadata')->willReturn($classMetadataMock);
 
         $qb = Filters::apply($em->createQueryBuilder()->select('t')->from('test', 't'), $filters, $mode);
 
