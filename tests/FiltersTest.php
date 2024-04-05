@@ -14,33 +14,33 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class FiltersTest extends TypeTestCase
 {
-    public function collectionProvider(): array
+    public static function collectionProvider(): array
     {
         return [
-            [['name__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.name LIKE "%test%"'],
-            [['name__like___or___surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.name LIKE "%test%" OR t.surname LIKE "%test%"'],
-            [['owner.name__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t LEFT JOIN t.owner owner WHERE owner.name LIKE "%test%"'],
-            [['owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t LEFT JOIN t.owner owner WHERE owner.name LIKE "%test%" OR owner.surname LIKE "%test%"'],
-            [['name__like' => 'test', 'owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t LEFT JOIN t.owner owner WHERE t.name LIKE "%test%" AND (owner.name LIKE "%test%" OR owner.surname LIKE "%test%")'],
-            [['name__like' => 'test', 'owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_OR, 'SELECT t FROM test t LEFT JOIN t.owner owner WHERE t.name LIKE "%test%" OR (owner.name LIKE "%test%" OR owner.surname LIKE "%test%")'],
-            [['status__in' => ['1', '2']], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.status IN(\'1\', \'2\')'],
-            [['field__null' => true], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.field IS NULL'],
-            [['field__null' => false], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.field IS NOT NULL'],
-            [['age__lt' => 1], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.age < 1'],
-            [['age__lte' => 1], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.age <= 1'],
-            [['age__gt' => 2], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.age > 2'],
-            [['age__gte' => 2], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.age >= 2'],
-            [['age__is' => null], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.age IS NULL'],
-            [['age__is' => 'null'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.age IS NULL'],
-            [['age__is' => 'not_null'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.age IS NOT NULL'],
-            [['field_with_underscores__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.field_with_underscores LIKE "%test%"'],
-            [['raw' => 'value'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.raw = "value"'],
-            [['raw_with_underscores' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.raw_with_underscores = "test"'],
-            [['name__like' => 'test', 'age__lt' => 1], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.name LIKE "%test%" AND t.age < 1'],
-            [['date__between' => ['01-01-1900', '01-01-2000']], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.date BETWEEN "01-01-1900" AND "01-01-2000"'],
-            [['number__between' => [50, 100]], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.number BETWEEN 50 AND 100'],
-            [['other__file__name__' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM test t WHERE t.other__file__name__ = "test"'],
-            [[], ['field' => 'asc'], Filters::MODE_AND, 'SELECT t FROM test t ORDER BY t.field asc'],
+            [['name__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.name LIKE "%test%"'],
+            [['name__like___or___surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.name LIKE "%test%" OR t.surname LIKE "%test%"'],
+            [['owner.name__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE owner.name LIKE "%test%"'],
+            [['owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE owner.name LIKE "%test%" OR owner.surname LIKE "%test%"'],
+            [['name__like' => 'test', 'owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE t.name LIKE "%test%" AND (owner.name LIKE "%test%" OR owner.surname LIKE "%test%")'],
+            [['name__like' => 'test', 'owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_OR, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE t.name LIKE "%test%" OR (owner.name LIKE "%test%" OR owner.surname LIKE "%test%")'],
+            [['status__in' => ['1', '2']], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.status IN(\'1\', \'2\')'],
+            [['field__null' => true], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.field IS NULL'],
+            [['field__null' => false], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.field IS NOT NULL'],
+            [['age__lt' => 1], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age < 1'],
+            [['age__lte' => 1], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age <= 1'],
+            [['age__gt' => 2], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age > 2'],
+            [['age__gte' => 2], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age >= 2'],
+            [['age__is' => null], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NULL'],
+            [['age__is' => 'null'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NULL'],
+            [['age__is' => 'not_null'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NOT NULL'],
+            [['field_with_underscores__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.field_with_underscores LIKE "%test%"'],
+            [['raw' => 'value'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.raw = "value"'],
+            [['raw_with_underscores' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.raw_with_underscores = "test"'],
+            [['name__like' => 'test', 'age__lt' => 1], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.name LIKE "%test%" AND t.age < 1'],
+            [['date__between' => ['01-01-1900', '01-01-2000']], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.date BETWEEN "01-01-1900" AND "01-01-2000"'],
+            [['number__between' => [50, 100]], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.number BETWEEN 50 AND 100'],
+            [['other__file__name__' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.other__file__name__ = "test"'],
+            [[], ['field' => 'asc'], Filters::MODE_AND, 'SELECT t FROM stdClass t ORDER BY t.field asc'],
         ];
     }
 
@@ -53,7 +53,7 @@ class FiltersTest extends TypeTestCase
         $em->method('getExpressionBuilder')->willReturn(new Expr());
         $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
 
-        $qb = Filters::apply($em->createQueryBuilder()->select('t')->from('test', 't'), $filters, $mode);
+        $qb = Filters::apply($em->createQueryBuilder()->select('t')->from(\stdClass::class, 't'), $filters, $mode);
 
         if (!empty($sortBy)) {
             Filters::sortBy($qb, $sortBy);
@@ -88,7 +88,7 @@ class FiltersTest extends TypeTestCase
         $em->method('getExpressionBuilder')->willReturn(new Expr());
         $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
 
-        Filters::apply($em->createQueryBuilder()->select('t')->from('test', 't'), ['test__is' => 'failed']);
+        Filters::apply($em->createQueryBuilder()->select('t')->from(\stdClass::class, 't'), ['test__is' => 'failed']);
     }
 
 //    public function testFilterForm()
@@ -114,7 +114,7 @@ class FiltersTest extends TypeTestCase
 //            $dql = str_ireplace(':'.$param->getName(), '"'.$param->getValue().'"', $dql);
 //        }
 //
-//        $this->assertEquals('SELECT t FROM test t WHERE t.example LIKE "%john%"', $dql);
+//        $this->assertEquals('SELECT t FROM stdClass t WHERE t.example LIKE "%john%"', $dql);
 //
 //        $options = $form->getConfig()->getOptions();
 //
