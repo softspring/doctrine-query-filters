@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterFormException;
 use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterValueException;
 use Softspring\Component\DoctrineQueryFilters\Exception\MissingFromInQueryBuilderException;
@@ -44,9 +45,7 @@ class FiltersTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @dataProvider collectionProvider
-     */
+    #[DataProvider('collectionProvider')]
     public function testAddPaginationFirstPage(array $filters, array $sortBy, int $mode, string $expectedDql): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
