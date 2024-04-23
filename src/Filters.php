@@ -2,6 +2,7 @@
 
 namespace Softspring\Component\DoctrineQueryFilters;
 
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
 use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterFormException;
 use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterValueException;
@@ -40,6 +41,7 @@ class Filters
     /**
      * @throws InvalidFilterValueException
      * @throws MissingFromInQueryBuilderException
+     * @throws MappingException
      */
     public static function apply(QueryBuilder $qb, array $filters, int $mode = self::MODE_AND): QueryBuilder
     {
@@ -48,7 +50,12 @@ class Filters
             $filtersExpression = $qb->expr()->orX();
 
             foreach ($filters as $filter) {
-                $filtersExpression->add(self::buildFieldExpression($qb, $filter, $value));
+                [$filterField, $subQuery] = self::splitSubQueryFieldName($filter);
+                if ($subQuery) {
+                    $filtersExpression->add($qb->expr()->in($qb->getRootAliases()[0], self::buildSubQuery($qb, $filterField, $subQuery, $value)));
+                } else {
+                    $filtersExpression->add(self::buildFieldExpression($qb, $filterField, $value));
+                }
             }
 
             self::MODE_OR === $mode ? $qb->orWhere($filtersExpression) : $qb->andWhere($filtersExpression);
@@ -179,12 +186,45 @@ class Filters
         return sprintf('%s.%s %s :%s', $entityAlias, $fieldName, $operator, $fieldParameter);
     }
 
+    /**
+     * @throws InvalidFilterValueException
+     * @throws MissingFromInQueryBuilderException
+     * @throws MappingException
+     */
+    protected static function buildSubQuery(QueryBuilder $qb, string $field, string $subquery, $value): ?string
+    {
+        $fieldName = self::splitFieldName($field)[0];
+        $childrenAssociationMapping = self::getChildrenAssociationMapping($qb, $fieldName);
+        $childrenClass = $childrenAssociationMapping['targetEntity'];
+        $childrenMappedBy = $childrenAssociationMapping['mappedBy'];
+
+        $mainIdField = $qb->getEntityManager()->getClassMetadata($qb->getDQLPart('from')[0]?->getFrom())->getSingleIdentifierFieldName();
+
+        $mainEntityAlias = $qb->getAllAliases()[0];
+
+        $alias = strtolower(substr($fieldName, 0, 2));
+
+        $sqb = $qb->getEntityManager()->getRepository($childrenClass)
+            ->createQueryBuilder($alias)
+            ->select("IDENTITY($alias.$childrenMappedBy)")
+            ->where("$alias.$childrenMappedBy = $mainEntityAlias.$mainIdField")
+        ;
+
+        $sqb->andWhere(self::buildFieldExpression($sqb, $subquery, $value));
+
+        $sqb->getParameters()->map(function ($parameter) use ($qb) {
+            $qb->setParameter($parameter->getName(), $parameter->getValue());
+        });
+
+        return $sqb->getDQL();
+    }
+
     protected static function splitOrFields(string $fieldName): array
     {
         return explode('___or___', $fieldName);
     }
 
-    private static function splitFieldName(string $field): array
+    protected static function splitFieldName(string $field): array
     {
         $parts = explode('__', $field);
 
@@ -199,5 +239,26 @@ class Filters
         $operator = array_pop($parts);
 
         return [implode('__', $parts), $operator];
+    }
+
+    protected static function splitSubQueryFieldName(string $field): array
+    {
+        $parts = explode('->', $field, 2);
+
+        if (1 == sizeof($parts)) {
+            return [$parts[0], null];
+        }
+
+        return $parts;
+    }
+
+    /**
+     * @throws MappingException
+     */
+    protected static function getChildrenAssociationMapping(QueryBuilder $qb, string $fieldName): array
+    {
+        $fromClassMetadata = $qb->getEntityManager()->getClassMetadata($qb->getDQLPart('from')[0]?->getFrom());
+
+        return $fromClassMetadata->getAssociationMapping($fieldName);
     }
 }
