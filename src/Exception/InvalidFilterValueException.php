@@ -2,6 +2,8 @@
 
 namespace Softspring\Component\DoctrineQueryFilters\Exception;
 
-class InvalidFilterValueException extends \Exception
+use Exception;
+
+class InvalidFilterValueException extends Exception
 {
 }

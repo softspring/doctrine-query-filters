@@ -2,12 +2,10 @@
 
 namespace Softspring\Component\DoctrineQueryFilters;
 
+use DateTime;
 use Doctrine\ORM\QueryBuilder;
-use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterFormException;
 use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterValueException;
 use Softspring\Component\DoctrineQueryFilters\Exception\MissingFromInQueryBuilderException;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class Filters
 {
@@ -132,8 +130,8 @@ class Filters
             case 'between':
                 $value0 = $value[0];
                 $value1 = $value[1];
-                $value0 = $value0 instanceof \DateTime ? $value0->format('Y-m-d') : $value0;
-                $value1 = $value1 instanceof \DateTime ? $value1->format('Y-m-d') : $value1;
+                $value0 = $value0 instanceof DateTime ? $value0->format('Y-m-d') : $value0;
+                $value1 = $value1 instanceof DateTime ? $value1->format('Y-m-d') : $value1;
 
                 // add quotes
                 $value0 = is_numeric($value0) ? $value0 : "\"$value0\"";
@@ -145,7 +143,7 @@ class Filters
             case 'lte':
             case 'gt':
             case 'gte':
-                $value = $value instanceof \DateTime ? '"'.$value->format('Y-m-d').'"' : $value;
+                $value = $value instanceof DateTime ? '"'.$value->format('Y-m-d').'"' : $value;
 
                 return $qb->expr()->$operatorName(sprintf('%s.%s', $entityAlias, $fieldName), $value);
 

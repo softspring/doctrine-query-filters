@@ -4,6 +4,7 @@ namespace Softspring\Component\DoctrineQueryFilters;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use ReflectionClass;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\Options;
@@ -56,7 +57,7 @@ class FiltersForm extends AbstractType implements FilterFormInterface
                 return $queryBuilder;
             }
 
-            $reflectionClass = new \ReflectionClass($options['class']);
+            $reflectionClass = new ReflectionClass($options['class']);
             $entityAlias = strtolower(substr($reflectionClass->getShortName(), 0, 1));
 
             return $options['em']->getRepository($options['class'])->createQueryBuilder($entityAlias);
