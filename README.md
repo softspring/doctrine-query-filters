@@ -1,10 +1,12 @@
+# Doctrine query filters
+
+![Latest Stable](https://img.shields.io/packagist/v/softspring/doctrine-query-filters?label=stable&style=flat-square)
+![Latest Unstable](https://img.shields.io/packagist/v/softspring/doctrine-query-filters?label=unstable&style=flat-square&include_prereleases)
+![License](https://img.shields.io/packagist/l/softspring/doctrine-query-filters?style=flat-square)
+![PHP Version](https://img.shields.io/packagist/dependency-v/softspring/doctrine-query-filters/php?style=flat-square)
+![Downloads](https://img.shields.io/packagist/dt/softspring/doctrine-query-filters?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/softspring/doctrine-query-filters/php.yml?branch=5.3&style=flat-square&label=CI)](https://github.com/softspring/doctrine-query-filters/actions/workflows/php.yml)
+![Coverage](https://raw.githubusercontent.com/softspring/doctrine-query-filters/5.3/.github/badges/coverage.svg)
+
 This library adds a new filter for doctrine queries
 
-*This bundle is under development, more features will be added soon, and existing ones may change.*
-
-[![Latest Stable Version](https://poser.pugx.org/softspring/doctrine-query-filters/v/stable.svg)](https://packagist.org/packages/softspring/doctrine-query-filters)
-[![Latest Unstable Version](https://poser.pugx.org/softspring/doctrine-query-filters/v/unstable.svg)](https://packagist.org/packages/softspring/doctrine-query-filters)
-[![License](https://poser.pugx.org/softspring/doctrine-query-filters/license.svg)](https://packagist.org/packages/softspring/doctrine-query-filters)
-[![Total Downloads](https://poser.pugx.org/softspring/doctrine-query-filters/downloads)](https://packagist.org/packages/softspring/doctrine-query-filters)
-[![Build status](https://github.com/softspring/doctrine-query-filters/actions/workflows/php.yml/badge.svg?branch=5.3)](https://github.com/softspring/doctrine-query-filters/actions/workflows/php.yml)
-![Coverage](https://raw.githubusercontent.com/softspring/doctrine-query-filters/5.3/.github/badges/coverage.svg)
