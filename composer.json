@@ -2,7 +2,7 @@
     "name": "softspring/doctrine-query-filters",
     "description": "This library adds a new filter for doctrine queries",
     "type": "library",
-    "license": "MIT",
+    "license": "AGPL-3.0",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
