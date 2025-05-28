@@ -127,6 +127,9 @@ class Filters
             case 'in':
                 return $qb->expr()->in(sprintf('%s.%s', $entityAlias, $fieldName), is_array($value) ? $value : [$value]);
 
+            case 'notIn':
+                return $qb->expr()->notIn(sprintf('%s.%s', $entityAlias, $fieldName), is_array($value) ? $value : [$value]);
+
             case 'between':
                 $value0 = $value[0];
                 $value1 = $value[1];
