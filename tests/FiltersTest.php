@@ -54,7 +54,7 @@ class FiltersTest extends TypeTestCase
 
         $qb = Filters::apply($em->createQueryBuilder()->select('t')->from(\stdClass::class, 't'), $filters, $mode);
 
-        if (!empty($sortBy)) {
+        if ($sortBy !== []) {
             Filters::sortBy($qb, $sortBy);
         }
 
@@ -68,7 +68,7 @@ class FiltersTest extends TypeTestCase
         $this->assertEquals($expectedDql, $dql);
     }
 
-    public function testMissingFromException()
+    public function testMissingFromException(): void
     {
         $this->expectException(MissingFromInQueryBuilderException::class);
 
@@ -79,7 +79,7 @@ class FiltersTest extends TypeTestCase
         Filters::apply($em->createQueryBuilder(), ['test' => true]);
     }
 
-    public function testInvalidFilterValueException()
+    public function testInvalidFilterValueException(): void
     {
         $this->expectException(InvalidFilterValueException::class);
 

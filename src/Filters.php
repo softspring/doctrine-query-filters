@@ -81,7 +81,7 @@ class Filters
 
         $joinDefined = false;
         $fieldAlias = $fieldName;
-        foreach ($joins as $a => $join) {
+        foreach ($joins as $join) {
             if ($join[0]->getJoin() == $joinFieldName) {
                 $joinDefined = true;
                 $fieldAlias = $join[0]->getAlias();
@@ -104,7 +104,7 @@ class Filters
         [$fieldName, $operatorName] = self::splitFieldName($field);
         $entityAliases = $qb->getAllAliases();
 
-        if (empty($entityAliases)) {
+        if ($entityAliases === []) {
             throw new MissingFromInQueryBuilderException();
         }
 
@@ -189,11 +189,11 @@ class Filters
     {
         $parts = explode('__', $field);
 
-        if (1 == sizeof($parts)) {
+        if (1 === count($parts)) {
             return [$parts[0], null];
         }
 
-        if (2 == sizeof($parts)) {
+        if (2 === count($parts)) {
             return $parts;
         }
 
