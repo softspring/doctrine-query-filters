@@ -104,7 +104,7 @@ class Filters
         [$fieldName, $operatorName] = self::splitFieldName($field);
         $entityAliases = $qb->getAllAliases();
 
-        if ($entityAliases === []) {
+        if ([] === $entityAliases) {
             throw new MissingFromInQueryBuilderException();
         }
 
@@ -153,21 +153,17 @@ class Filters
             case 'null':
                 if ($value) {
                     return sprintf('%s.%s IS NULL', $entityAlias, $fieldName);
-                } else {
-                    return sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName);
                 }
 
-                // no break
+                return sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName);
+
             case 'is':
                 if (null === $value || 'null' === $value) {
                     return sprintf('%s.%s IS NULL', $entityAlias, $fieldName);
                 } elseif ('not_null' === $value) {
                     return sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName);
-                } else {
-                    throw new InvalidFilterValueException('Invalid is filter, must be "null", null or "not_null", no other case is yet implemented');
                 }
-
-                // no break
+                throw new InvalidFilterValueException('Invalid is filter, must be "null", null or "not_null", no other case is yet implemented');
             default:
                 if (!isset($fieldNameParts)) {
                     $fieldName = $field;

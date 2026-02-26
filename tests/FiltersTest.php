@@ -2,6 +2,7 @@
 
 namespace Softspring\Component\DoctrineQueryFilters\Tests;
 
+use stdClass;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
@@ -52,7 +53,7 @@ class FiltersTest extends TypeTestCase
         $em->method('getExpressionBuilder')->willReturn(new Expr());
         $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
 
-        $qb = Filters::apply($em->createQueryBuilder()->select('t')->from(\stdClass::class, 't'), $filters, $mode);
+        $qb = Filters::apply($em->createQueryBuilder()->select('t')->from(stdClass::class, 't'), $filters, $mode);
 
         if ($sortBy !== []) {
             Filters::sortBy($qb, $sortBy);
@@ -87,7 +88,7 @@ class FiltersTest extends TypeTestCase
         $em->method('getExpressionBuilder')->willReturn(new Expr());
         $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
 
-        Filters::apply($em->createQueryBuilder()->select('t')->from(\stdClass::class, 't'), ['test__is' => 'failed']);
+        Filters::apply($em->createQueryBuilder()->select('t')->from(stdClass::class, 't'), ['test__is' => 'failed']);
     }
 
 //    public function testFilterForm()
