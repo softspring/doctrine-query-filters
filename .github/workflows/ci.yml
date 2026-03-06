@@ -19,11 +19,11 @@ jobs:
             contents: write
         strategy:
             matrix:
-                php-versions: [ '8.2', '8.4' ]
+                php-versions: [ '8.4' ]
                 composer-prefer: [ '', '--prefer-lowest' ]
 
         steps:
-            -   uses: actions/checkout@v5
+            -   uses: actions/checkout@v6
 
             -   name: Install PHP
                 uses: shivammathur/setup-php@v2
