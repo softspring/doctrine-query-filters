@@ -51,7 +51,7 @@
             "XDEBUG_MODE=coverage vendor/bin/phpunit",
             "vendor/bin/rector process src tests --dry-run",
             "vendor/bin/phpstan analyse src tests --level 5",
-            "vendor/bin/php-cs-fixer fix --dry-run --diff",
+            "vendor/bin/php-cs-fixer fix --dry-run --diff --sequential",
             "vendor/bin/yaml-lint .github/ -vvv --parse-tags"
         ],
         "test": [
