@@ -124,6 +124,12 @@ class Filters
                 $value = "%$value%";
                 break;
 
+            case 'ilike':
+                $operator = 'LIKE';
+                $value = mb_strtolower("%$value%");
+                $fieldName = sprintf('LOWER(%s.%s)', $entityAlias, $fieldName);
+                break;
+
             case 'in':
                 return $qb->expr()->in(sprintf('%s.%s', $entityAlias, $fieldName), is_array($value) ? $value : [$value]);
 
@@ -172,6 +178,10 @@ class Filters
         }
 
         $qb->setParameter($fieldParameter, $value);
+
+        if (str_starts_with($fieldName, 'LOWER(')) {
+            return sprintf('%s %s :%s', $fieldName, $operator, $fieldParameter);
+        }
 
         return sprintf('%s.%s %s :%s', $entityAlias, $fieldName, $operator, $fieldParameter);
     }
