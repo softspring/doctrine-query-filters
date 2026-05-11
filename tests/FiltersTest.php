@@ -21,10 +21,15 @@ class FiltersTest extends TypeTestCase
     {
         return [
             [['name__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.name LIKE "%test%"'],
+            [['name__ilike' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE LOWER(t.name) LIKE "%test%"'],
             [['name__like___or___surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.name LIKE "%test%" OR t.surname LIKE "%test%"'],
+            [['name__ilike___or___surname__ilike' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE LOWER(t.name) LIKE "%test%" OR LOWER(t.surname) LIKE "%test%"'],
             [['owner.name__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE owner.name LIKE "%test%"'],
+            [['owner.name__ilike' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE LOWER(owner.name) LIKE "%test%"'],
             [['owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE owner.name LIKE "%test%" OR owner.surname LIKE "%test%"'],
+            [['owner.name__ilike___or___owner.surname__ilike' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE LOWER(owner.name) LIKE "%test%" OR LOWER(owner.surname) LIKE "%test%"'],
             [['name__like' => 'test', 'owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE t.name LIKE "%test%" AND (owner.name LIKE "%test%" OR owner.surname LIKE "%test%")'],
+            [['name__ilike' => 'test', 'owner.name__ilike___or___owner.surname__ilike' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE LOWER(t.name) LIKE "%test%" AND (LOWER(owner.name) LIKE "%test%" OR LOWER(owner.surname) LIKE "%test%")'],
             [['name__like' => 'test', 'owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_OR, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE t.name LIKE "%test%" OR (owner.name LIKE "%test%" OR owner.surname LIKE "%test%")'],
             [['status__in' => ['1', '2']], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.status IN(\'1\', \'2\')'],
             [['field__null' => true], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.field IS NULL'],
@@ -37,6 +42,7 @@ class FiltersTest extends TypeTestCase
             [['age__is' => 'null'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NULL'],
             [['age__is' => 'not_null'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NOT NULL'],
             [['field_with_underscores__like' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.field_with_underscores LIKE "%test%"'],
+            [['field_with_underscores__ilike' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE LOWER(t.field_with_underscores) LIKE "%test%"'],
             [['raw' => 'value'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.raw = "value"'],
             [['raw_with_underscores' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.raw_with_underscores = "test"'],
             [['name__like' => 'test', 'age__lt' => 1], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.name LIKE "%test%" AND t.age < 1'],

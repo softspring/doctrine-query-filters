@@ -12,7 +12,7 @@ This file defines the expected behavior and scope of the component.
 ## Main Features
 
 - Apply filters to a Doctrine `QueryBuilder` from a simple associative array.
-- Support operators such as equality, `like`, `in`, `notIn`, `between`, comparisons, and null checks.
+- Support operators such as equality, `like`, `ilike`, `in`, `notIn`, `between`, comparisons, and null checks.
 - Support grouped OR filters through combined field syntax.
 - Support `order by` definitions, including joined-property sorting.
 - Provide a base `FiltersForm` type for GET-based filter forms.
