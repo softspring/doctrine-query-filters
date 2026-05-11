@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Softspring\Component\DoctrineQueryFilters\Tests;
 
 use Softspring\Component\DoctrineQueryFilters\FiltersForm;
