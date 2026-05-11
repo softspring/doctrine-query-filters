@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Softspring\Component\DoctrineQueryFilters\Exception\InvalidFilterValueException;
 use Softspring\Component\DoctrineQueryFilters\Exception\MissingFromInQueryBuilderException;
@@ -14,7 +13,6 @@ use Softspring\Component\DoctrineQueryFilters\Filters;
 use stdClass;
 use Symfony\Component\Form\Test\TypeTestCase;
 
-#[AllowMockObjectsWithoutExpectations]
 class FiltersTest extends TypeTestCase
 {
     public static function collectionProvider(): array

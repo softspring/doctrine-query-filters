@@ -5,14 +5,12 @@ namespace Softspring\Component\DoctrineQueryFilters\Tests;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Softspring\Component\DoctrineQueryFilters\Filters;
 use stdClass;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-#[AllowMockObjectsWithoutExpectations]
 class FiltersFormTest extends TestCase
 {
     public function testDefaultsUseGetMethodAndCreateDefaultQueryBuilder(): void
