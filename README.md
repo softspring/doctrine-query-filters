@@ -6,7 +6,7 @@
 [![PHP Version](https://img.shields.io/packagist/dependency-v/softspring/doctrine-query-filters/php?style=flat-square)](https://github.com/softspring/doctrine-query-filters/blob/6.0/composer.json)
 [![Downloads](https://img.shields.io/packagist/dt/softspring/doctrine-query-filters?style=flat-square)](https://packagist.org/packages/softspring/doctrine-query-filters)
 [![CI](https://img.shields.io/github/actions/workflow/status/softspring/doctrine-query-filters/ci.yml?branch=6.0&style=flat-square&label=CI)](https://github.com/softspring/doctrine-query-filters/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/softspring/doctrine-query-filters?branch=6.0&style=flat-square)](https://codecov.io/gh/softspring/doctrine-query-filters)
+[![Coverage](https://img.shields.io/codecov/c/github/softspring/doctrine-query-filters?branch=6.0&style=flat-square)](https://app.codecov.io/gh/softspring/doctrine-query-filters/tree/6.0)
 
 This component applies reusable filter and sorting logic to Doctrine query builders and provides a base Symfony filter form type.
 
