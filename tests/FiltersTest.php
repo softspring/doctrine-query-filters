@@ -2,6 +2,7 @@
 
 namespace Softspring\Component\DoctrineQueryFilters\Tests;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
@@ -30,12 +31,15 @@ class FiltersTest extends TypeTestCase
             [['name__ilike' => 'test', 'owner.name__ilike___or___owner.surname__ilike' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE LOWER(t.name) LIKE "%test%" AND (LOWER(owner.name) LIKE "%test%" OR LOWER(owner.surname) LIKE "%test%")'],
             [['name__like' => 'test', 'owner.name__like___or___owner.surname__like' => 'test'], [], Filters::MODE_OR, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner WHERE t.name LIKE "%test%" OR (owner.name LIKE "%test%" OR owner.surname LIKE "%test%")'],
             [['status__in' => ['1', '2']], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.status IN(\'1\', \'2\')'],
+            [['status__notIn' => ['1', '2']], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.status NOT IN(\'1\', \'2\')'],
+            [['status__notIn' => 'archived'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.status NOT IN(\'archived\')'],
             [['field__null' => true], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.field IS NULL'],
             [['field__null' => false], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.field IS NOT NULL'],
             [['age__lt' => 1], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age < 1'],
             [['age__lte' => 1], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age <= 1'],
             [['age__gt' => 2], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age > 2'],
             [['age__gte' => 2], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age >= 2'],
+            [['publishedAt__lt' => new DateTime('2026-01-15')], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.publishedAt < "2026-01-15"'],
             [['age__is' => null], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NULL'],
             [['age__is' => 'null'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NULL'],
             [['age__is' => 'not_null'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.age IS NOT NULL'],
@@ -46,8 +50,10 @@ class FiltersTest extends TypeTestCase
             [['name__like' => 'test', 'age__lt' => 1], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.name LIKE "%test%" AND t.age < 1'],
             [['date__between' => ['01-01-1900', '01-01-2000']], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.date BETWEEN "01-01-1900" AND "01-01-2000"'],
             [['number__between' => [50, 100]], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.number BETWEEN 50 AND 100'],
+            [['date__between' => [new DateTime('2026-01-01'), new DateTime('2026-01-31')]], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.date BETWEEN "2026-01-01" AND "2026-01-31"'],
             [['other__file__name__' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.other__file__name__ = "test"'],
             [[], ['field' => 'asc'], Filters::MODE_AND, 'SELECT t FROM stdClass t ORDER BY t.field asc'],
+            [[], ['owner.name' => 'desc'], Filters::MODE_AND, 'SELECT t FROM stdClass t LEFT JOIN t.owner owner ORDER BY owner.name desc'],
         ];
     }
 
@@ -94,6 +100,22 @@ class FiltersTest extends TypeTestCase
         $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
 
         Filters::apply($em->createQueryBuilder()->select('t')->from(stdClass::class, 't'), ['test__is' => 'failed']);
+    }
+
+    public function testSortByReusesExistingJoinAlias(): void
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getExpressionBuilder')->willReturn(new Expr());
+        $em->method('createQueryBuilder')->willReturn(new QueryBuilder($em));
+
+        $qb = $em->createQueryBuilder()
+            ->select('t')
+            ->from(stdClass::class, 't')
+            ->leftJoin('t.owner', 'userOwner');
+
+        Filters::sortBy($qb, ['owner.name' => 'asc']);
+
+        self::assertSame('SELECT t FROM stdClass t LEFT JOIN t.owner userOwner ORDER BY userOwner.name asc', $qb->getDQL());
     }
 
     //    public function testFilterForm()
