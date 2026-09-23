@@ -166,7 +166,8 @@ class Filters
             case 'is':
                 if (null === $value || 'null' === $value) {
                     return sprintf('%s.%s IS NULL', $entityAlias, $fieldName);
-                } elseif ('not_null' === $value) {
+                }
+                if ('not_null' === $value) {
                     return sprintf('%s.%s IS NOT NULL', $entityAlias, $fieldName);
                 }
                 throw new InvalidFilterValueException('Invalid is filter, must be "null", null or "not_null", no other case is yet implemented');

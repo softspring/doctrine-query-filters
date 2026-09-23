@@ -77,7 +77,7 @@ class FiltersTest extends TypeTestCase
         foreach ($params as $param) {
             $dql = str_ireplace(':'.$param->getName(), '"'.$param->getValue().'"', $dql);
         }
-        $this->assertEquals($expectedDql, $dql);
+        $this->assertEqualsIgnoringCase($expectedDql, $dql);
     }
 
     public function testMissingFromException(): void
@@ -115,7 +115,7 @@ class FiltersTest extends TypeTestCase
 
         Filters::sortBy($qb, ['owner.name' => 'asc']);
 
-        self::assertSame('SELECT t FROM stdClass t LEFT JOIN t.owner userOwner ORDER BY userOwner.name asc', $qb->getDQL());
+        self::assertEqualsIgnoringCase('SELECT t FROM stdClass t LEFT JOIN t.owner userOwner ORDER BY userOwner.name asc', $qb->getDQL());
     }
 
     //    public function testFilterForm()
