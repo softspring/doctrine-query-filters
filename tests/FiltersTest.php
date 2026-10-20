@@ -41,7 +41,7 @@ class FiltersTest extends TypeTestCase
             [['date__between' => ['01-01-1900', '01-01-2000']], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.date BETWEEN "01-01-1900" AND "01-01-2000"'],
             [['number__between' => [50, 100]], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.number BETWEEN 50 AND 100'],
             [['other__file__name__' => 'test'], [], Filters::MODE_AND, 'SELECT t FROM stdClass t WHERE t.other__file__name__ = "test"'],
-            [[], ['field' => 'asc'], Filters::MODE_AND, 'SELECT t FROM stdClass t ORDER BY t.field asc'],
+            [[], ['field' => 'asc'], Filters::MODE_AND, 'SELECT t FROM stdClass t ORDER BY t.field ASC'],
         ];
     }
 
@@ -65,6 +65,8 @@ class FiltersTest extends TypeTestCase
         foreach ($params as $param) {
             $dql = str_ireplace(':'.$param->getName(), '"'.$param->getValue().'"', $dql);
         }
+        // Doctrine ORM 2 preserves the direction case; ORM 3 normalizes it.
+        $dql = preg_replace_callback('/\b(asc|desc)$/i', static fn (array $match): string => strtoupper($match[0]), $dql);
         $this->assertEquals($expectedDql, $dql);
     }
 
